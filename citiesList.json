@@ -1,0 +1,658 @@
+[
+  {
+    "aceh": [
+      "simeulue",
+      "aceh singkil",
+      "aceh singkil",
+      "aceh singkil",
+      "aceh singkil",
+      "aceh selatan",
+      "aceh tenggara",
+      "aceh timur",
+      "aceh tengah",
+      "aceh barat",
+      "aceh besar",
+      "pidie",
+      "bireuen",
+      "aceh utara",
+      "aceh barat daya",
+      "gayo lues",
+      "aceh tamiang",
+      "nagan raya",
+      "aceh jaya",
+      "bener meriah",
+      "pidie jaya",
+      "banda aceh",
+      "sabang",
+      "langsa",
+      "lhokseumawe",
+      "subulussalam"
+    ]
+  },
+  {
+    "bali": [
+      "jembrana",
+      "tabanan",
+      "badung",
+      "gianyar",
+      "klungkung",
+      "bangli",
+      "karang asem",
+      "buleleng",
+      "denpasar"
+    ]
+  },
+  {
+    "banten": [
+      "pandeglang",
+      "lebak",
+      "tangerang",
+      "serang",
+      "tangerang",
+      "cilegon",
+      "serang",
+      "tangerang selatan"
+    ]
+  },
+  {
+    "bengkulu": [
+      "bengkulu selatan",
+      "rejang lebong",
+      "bengkulu utara",
+      "kaur",
+      "seluma",
+      "mukomuko",
+      "lebong",
+      "kepahiang",
+      "bengkulu tengah",
+      "bengkulu"
+    ]
+  },
+  {
+    "gorontalo": [
+      "boalemo",
+      "gorontalo",
+      "pohuwato",
+      "bone bolango",
+      "gorontalo utara",
+      "gorontalo"
+    ]
+  },
+  {
+    "jakarta": [
+      "jakarta selatan",
+      "jakarta timur",
+      "jakarta pusat",
+      "jakarta barat",
+      "jakarta utara"
+    ]
+  },
+  {
+    "jambi": [
+      "kerinci",
+      "merangin",
+      "sarolangun",
+      "batang hari",
+      "muaro jambi",
+      "tanjung jabung timur",
+      "tanjung jabung barat",
+      "tebo",
+      "bungo",
+      "jambi",
+      "sungai penuh"
+    ]
+  },
+  {
+    "jawa-barat": [
+      "bogor",
+      "sukabumi",
+      "cianjur",
+      "bandung",
+      "garut",
+      "tasikmalaya",
+      "ciamis",
+      "kuningan",
+      "cirebon",
+      "majalengka",
+      "sumedang",
+      "indramayu",
+      "subang",
+      "purwakarta",
+      "karawang",
+      "bekasi",
+      "bandung barat",
+      "pangandaran",
+      "bogor",
+      "bandung",
+      "cirebon",
+      "bekasi",
+      "depok",
+      "cimahi",
+      "tasikmalaya",
+      "banjar",
+      "waduk cira"
+    ]
+  },
+  {
+    "jawa-tengah": [
+      "cilacap",
+      "banyumas",
+      "purbalingga",
+      "banjarnegara",
+      "kebumen",
+      "purworejo",
+      "wonosobo",
+      "magelang",
+      "boyolali",
+      "klaten",
+      "sukoharjo",
+      "wonogiri",
+      "karanganyar",
+      "sragen",
+      "grobogan",
+      "blora",
+      "rembang",
+      "pati",
+      "kudus",
+      "jepara",
+      "demak",
+      "semarang",
+      "temanggung",
+      "kendal",
+      "batang",
+      "pekalongan",
+      "pemalang",
+      "tegal",
+      "brebes",
+      "magelang",
+      "surakarta",
+      "salatiga",
+      "semarang",
+      "pekalongan",
+      "tegal",
+      "waduk kedu"
+    ]
+  },
+  {
+    "jawa-timur": [
+      "pacitan",
+      "ponorogo",
+      "trenggalek",
+      "tulungagung",
+      "blitar",
+      "kediri",
+      "malang",
+      "lumajang",
+      "jember",
+      "banyuwangi",
+      "bondowoso",
+      "situbondo",
+      "probolinggo",
+      "pasuruan",
+      "sidoarjo",
+      "mojokerto",
+      "jombang",
+      "nganjuk",
+      "madiun",
+      "magetan",
+      "ngawi",
+      "bojonegoro",
+      "tuban",
+      "lamongan",
+      "gresik",
+      "bangkalan",
+      "sampang",
+      "pamekasan",
+      "sumenep",
+      "kediri",
+      "blitar",
+      "malang",
+      "probolinggo",
+      "pasuruan",
+      "mojokerto",
+      "madiun",
+      "surabaya",
+      "batu"
+    ]
+  },
+  {
+    "kalimantan-barat": [
+      "sambas",
+      "bengkayang",
+      "landak",
+      "mempawah",
+      "sanggau",
+      "ketapang",
+      "sintang",
+      "kapuas hulu",
+      "sekadau",
+      "melawi",
+      "kayong utara",
+      "kubu raya",
+      "mempawah",
+      "singkawang"
+    ]
+  },
+  {
+    "kalimantan-selatan": [
+      "tanah laut",
+      "kota baru",
+      "banjar",
+      "barito kuala",
+      "tapin",
+      "hulu sungai selatan",
+      "hulu sungai tengah",
+      "hulu sungai utara",
+      "tabalong",
+      "tanah bumbu",
+      "balangan",
+      "banjarmasin",
+      "banjar baru"
+    ]
+  },
+  {
+    "kalimantan-tengah": [
+      "kotawaringin barat",
+      "kotawaringin timur",
+      "kapuas",
+      "barito selatan",
+      "barito utara",
+      "sukamara",
+      "lamandau",
+      "seruyan",
+      "katingan",
+      "pulang pisau",
+      "gunung mas",
+      "barito timur",
+      "murung raya",
+      "palangka raya"
+    ]
+  },
+  {
+    "kalimantan-timur": [
+      "paser",
+      "kutai barat",
+      "kutai kartanegara",
+      "kutai timur",
+      "berau",
+      "penajam paser utara",
+      "mahakam ulu",
+      "balikpapan",
+      "samarinda",
+      "bontang"
+    ]
+  },
+  {
+    "kalimantan-utara": [
+      "malinau",
+      "bulungan",
+      "tana tidung",
+      "nunukan",
+      "tarakan"
+    ]
+  },
+  {
+    "kepulauan-bangka-belitung": [
+      "bangka",
+      "belitung",
+      "bangka barat",
+      "bangka tengah",
+      "bangka selatan",
+      "belitung timur",
+      "pangkalpinang"
+    ]
+  },
+  {
+    "kepulauan-riau": [
+      "karimun",
+      "bintan",
+      "natuna",
+      "lingga",
+      "kepulauan anambas",
+      "batam",
+      "tanjung pinang"
+    ]
+  },
+  {
+    "kepulauan-seribu": ["kepulauan seribu"]
+  },
+  {
+    "lampung": [
+      "lampung barat",
+      "tanggamus",
+      "lampung selatan",
+      "lampung timur",
+      "lampung tengah",
+      "lampung utara",
+      "way kanan",
+      "tulang bawang",
+      "pesawaran",
+      "pringsewu",
+      "mesuji",
+      "tulang bawang barat",
+      "pesisir barat",
+      "bandar lampung",
+      "metro"
+    ]
+  },
+  {
+    "maluku": [
+      "maluku tenggara barat",
+      "maluku tenggara",
+      "maluku tengah",
+      "buru",
+      "kepulauan aru",
+      "seram bagian barat",
+      "seram bagian timur",
+      "maluku barat daya",
+      "buru selatan",
+      "ambon",
+      "tual"
+    ]
+  },
+  {
+    "maluku-utara": [
+      "halmahera barat",
+      "halmahera tengah",
+      "kepulauan sula",
+      "halmahera selatan",
+      "halmahera utara",
+      "halmahera timur",
+      "pulau morotai",
+      "pulau taliabu",
+      "ternate",
+      "tidore kepulauan"
+    ]
+  },
+  {
+    "nusa-tenggara-barat": [
+      "lombok barat",
+      "lombok tengah",
+      "lombok timur",
+      "sumbawa",
+      "dompu",
+      "bima",
+      "sumbawa barat",
+      "lombok utara",
+      "mataram",
+      "bima"
+    ]
+  },
+  {
+    "nusa-tenggara-timur": [
+      "sumba barat",
+      "sumba timur",
+      "kupang",
+      "timor tengah selatan",
+      "timor tengah selatan",
+      "timor tengah selatan",
+      "timor tengah selatan",
+      "timor tengah utara",
+      "belu",
+      "alor",
+      "lembata",
+      "flores timur",
+      "sikka",
+      "ende",
+      "ngada",
+      "manggarai",
+      "rote ndao",
+      "manggarai barat",
+      "sumba tengah",
+      "sumba barat daya",
+      "nagekeo",
+      "manggarai timur",
+      "sabu raijua",
+      "malaka",
+      "kota kupang"
+    ]
+  },
+  {
+    "papua-barat": [
+      "fakfak",
+      "kaimana",
+      "teluk wondama",
+      "teluk bintuni",
+      "manokwari",
+      "sorong selatan",
+      "sorong",
+      "raja ampat",
+      "tambrauw",
+      "maybrat",
+      "manokwari selatan",
+      "manokwari",
+      "sorong"
+    ]
+  },
+  {
+    "papua": [
+      "merauke",
+      "jayawijaya",
+      "jayapura",
+      "nabire",
+      "kepulauan yapen",
+      "biak numfor",
+      "paniai",
+      "puncak jaya",
+      "mimika",
+      "boven digoel",
+      "mappi",
+      "asmat",
+      "yahukimo",
+      "pegunungan bintang",
+      "tolikara",
+      "sarmi",
+      "keerom",
+      "waropen",
+      "supiori",
+      "mamberamo raya",
+      "nduga",
+      "lanny jaya",
+      "mamberamo tengah",
+      "yalimo",
+      "puncak",
+      "dogiyai",
+      "intan jaya",
+      "deiyai",
+      "jayapura"
+    ]
+  },
+  {
+    "riau": [
+      "kuantan singingi",
+      "indragiri hulu",
+      "indragiri hilir",
+      "pelalawan",
+      "siak",
+      "kampar",
+      "rokan hulu",
+      "bengkalis",
+      "rokan hilir",
+      "kepulauan meranti",
+      "pekanbaru",
+      "dumai"
+    ]
+  },
+  {
+    "sulawesi-barat": [
+      "majene",
+      "polewali mandar",
+      "mamasa",
+      "mamuju",
+      "mamuju utara",
+      "mamuju tengah"
+    ]
+  },
+  {
+    "sulawesi-selatan": [
+      "kepulauan selayar",
+      "bulukumba",
+      "bantaeng",
+      "jeneponto",
+      "takalar",
+      "gowa",
+      "sinjai",
+      "maros",
+      "pangkajene dan kepulauan",
+      "barru",
+      "bone",
+      "soppeng",
+      "wajo",
+      "sidenreng rappang",
+      "pinrang",
+      "enrekang",
+      "luwu",
+      "tana toraja",
+      "luwu utara",
+      "luwu timur",
+      "toraja utara",
+      "makassar",
+      "parepare",
+      "palopo"
+    ]
+  },
+  {
+    "sulawesi-tengah": [
+      "banggai kepulauan",
+      "banggai",
+      "morowali",
+      "poso",
+      "donggala",
+      "tolitoli",
+      "buol",
+      "parigi moutong",
+      "tojo una-una",
+      "sigi",
+      "banggai laut",
+      "morowali utara",
+      "palu"
+    ]
+  },
+  {
+    "sulawesi-tenggara": [
+      "buton",
+      "muna",
+      "konawe",
+      "kolaka",
+      "konawe selatan",
+      "bombana",
+      "wakatobi",
+      "kolaka utara",
+      "buton utara",
+      "konawe utara",
+      "kolaka timur",
+      "kendari",
+      "baubau"
+    ]
+  },
+  {
+    "sulawesi-utara": [
+      "bolaang mongondow",
+      "minahasa",
+      "kepulauan sangihe",
+      "kepulauan talaud",
+      "minahasa selatan",
+      "minahasa utara",
+      "bolaang mongondow utara",
+      "siau tagulandang biaro",
+      "minahasa tenggara",
+      "bolaang mongondow selatan",
+      "bolaang mongondow timur",
+      "manado",
+      "bitung",
+      "tomohon",
+      "kotamobagu"
+    ]
+  },
+  {
+    "sumatera-barat": [
+      "kepulauan mentawai",
+      "pesisir selatan",
+      "solok",
+      "sijunjung",
+      "tanah datar",
+      "padang pariaman",
+      "agam",
+      "lima puluh kota",
+      "pasaman",
+      "solok selatan",
+      "dharmasraya",
+      "pasaman barat",
+      "padang",
+      "solok",
+      "sawah lunto",
+      "padang panjang",
+      "bukittinggi",
+      "payakumbuh",
+      "pariaman"
+    ]
+  },
+  {
+    "sumatera-selatan": [
+      "ogan komering ulu",
+      "ogan komering ilir",
+      "muara enim",
+      "lahat",
+      "musi rawas",
+      "musi banyuasin",
+      "banyuasin",
+      "ogan komering ulu selatan",
+      "ogan komering ulu timur",
+      "ogan ilir",
+      "empat lawang",
+      "penukal abab lematang ilir",
+      "musi rawas utara",
+      "palembang",
+      "prabumulih",
+      "pagar alam",
+      "lubuklinggau"
+    ]
+  },
+  {
+    "sumatera-utara": [
+      "nias",
+      "mandailing natal",
+      "tapanuli selatan",
+      "tapanuli tengah",
+      "tapanuli utara",
+      "toba samosir",
+      "labuhan batu",
+      "asahan",
+      "simalungun",
+      "dairi",
+      "karo",
+      "deli serdang",
+      "langkat",
+      "nias selatan",
+      "humbang hasundutan",
+      "pakpak bharat",
+      "samosir",
+      "serdang bedagai",
+      "batu bara",
+      "padang lawas utara",
+      "padang lawas",
+      "labuhan batu selatan",
+      "labuhan batu utara",
+      "nias utara",
+      "nias barat",
+      "sibolga",
+      "tanjung balai",
+      "pematang siantar",
+      "tebing tinggi",
+      "medan",
+      "binjai",
+      "padangsidimpuan",
+      "gunungsitoli",
+      "danau toba"
+    ]
+  },
+  {
+    "yogyakarta": [
+      "kulon progo",
+      "bantul",
+      "gunung kidul",
+      "sleman",
+      "yogyakarta"
+    ]
+  }
+]
