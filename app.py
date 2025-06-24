@@ -21,6 +21,7 @@ from constants.renewableEnergy import renewable_energy_projects_high_poverty, re
 from models.AQI import calculate_aqi_ispu
 from models.potentialScore import PotentialScoreCalculator
 from utils.functions import convert_json_string_to_dict, remove_json_wrapper
+import csv
 
 app = FastAPI()
 carbon_sites = "https://www.investing.com/commodities/carbon-emissions-historical-data"
@@ -33,36 +34,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# try:
-#     # ee.Initialize(project='davidsiddiii')
-#     ee.Initialize(project='ee-kurniakharisma17')
-# except Exception as e:
-#     print("Error initializing Earth Engine:", str(e))
+try:
+    # ee.Initialize(project='davidsiddiii')
+    ee.Initialize(project='ee-kurniakharisma17')
+except Exception as e:
+    print("Error initializing Earth Engine:", str(e))
 
 try:
+    print("load")
     with open("poverty_model.pkl", "rb") as f:
         poverty_model = pickle.load(f)
+    print("successfully")
 except Exception as e:
     print("Error loading poverty model:", str(e))
     poverty_model = None
-
-# try:
-#     with open("pm25_ispu_model.dill", "rb") as f:
-#         ispu_model= dill.load(f)
-#         print("ISPU model loaded successfully")
-
-# except Exception as e:
-#     print("Error loading ISPU model:", str(e))
-#     ispu_model = None
-
-# try:
-#     with open("potential_model.dill", "rb") as f:
-#         potential_model= dill.load(f)
-#         print("potential model loaded successfully")
-
-# except Exception as e:
-#     print("Error loading potential model:", str(e))
-#     potential_model = None
 
 with open('kota_coords.json', 'r') as json_file:
     district_coords = json.load(json_file)
@@ -309,9 +294,9 @@ def fetch_all_environmental_data():
     Fetches environmental data for all provinces and districts.
     """
     province_data = fetch_province_environmental_data()
-    district_data = fetch_district_environmental_data()
+    # district_data = fetch_district_environmental_data()
 
-    combined_data = {**province_data, **district_data}
+    combined_data = {**province_data}
     
     
     unique_data = {k: combined_data[k] for k in set(combined_data.keys())}
@@ -671,20 +656,29 @@ def get_pm25():
 
     except Exception as e:
         return {"error": f"Failed to retrieve PM2.5: {str(e)}"}
-    
+
+
+
+  
 @app.get("/get-infrastructure-detail")
 def get_infrastructure_detail():
     try:
         data_coords = {}
+        # Ambil Waktu pengambilan data 
         period = datetime.now().strftime("%Y-%m-%d")
+
+        # Fetch data nighttime lights dan Daylight (solar radiation)
         geospatial_dict = fetch_geospatial_data()
         
+        # Fetch environmental data untuk seluruh provinces dan kota (NDVI, CO, SO2, NO2, Precipitation, Sentinel, O3, PM2.5)
         environmental_data = fetch_all_environmental_data()
        
+        # Loop untuk setiap provinsi dan kota
         for province, datas in environmental_data.items():
+            # Pakai ML untuk memprediksi poverty index
             poverty_index = predict_poverty_index(province, geospatial_dict)
-            
 
+            # Ambil data mentah dari environmental_data
             try:
                 ndvi = float(datas.get("ndvi", 0))
             except (ValueError, TypeError):
@@ -725,6 +719,7 @@ def get_infrastructure_detail():
             except (ValueError, TypeError):
                 pm25 = 0.0
             
+            # Memastikan nilai poverty_index adalah float atau null
             safe_poverty_index = 9.0
             if poverty_index is not None and not isinstance(poverty_index, str):
                 try:
@@ -745,12 +740,14 @@ def get_infrastructure_detail():
                 infrastructure
             )
 
+            # Menghitung AQI berdasarkan PM2.5
             try:
                 aqi_values = calculate_aqi_ispu(pm25)
             except Exception:
                 aqi_values = 0 
  
  
+            # Buat baris data kedalam dictionary
             data_coords[province] = {
                 "province": province,
                 "infrastructure": infrastructure,
@@ -770,6 +767,7 @@ def get_infrastructure_detail():
                 "aqi": aqi_values
             }
 
+        # Connect ke database
         conn = get_db_connection()
         cur = conn.cursor()
 
@@ -794,15 +792,69 @@ def get_infrastructure_detail():
                 data["aqi"]
             ))
 
-        # Execute the batch insert function with the list of composite values
+        # Masukkan data ke dalam database
         cur.execute("SELECT insert_infrastructure_data_batch(%s::infrastructure_input[])", (data_list,))
         conn.commit()
         
+        # Selesai
         return {"status": "Success", "data_count": len(data_list)}
         
     except Exception as ex:
         print("Error inserting data into Database:", ex)
         return {"error": "An error occurred while processing the request: " + str(ex)}
+    
+# Endpoint untuk mendapatkan data infrastruktur dalam format CSV
+@app.get('/get-csv')
+def get_csv():
+    try:
+        # Koneksi ke database
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        # Eksekusi query untuk mendapatkan data infrastruktur
+        cursor.execute("SELECT * FROM infrastructure")
+        rows = cursor.fetchall()
+        columns = [desc[0] for desc in cursor.description]
+        conn.close()
+
+        # Mapping data ke dalam dictionary & Potential Score
+        for row in rows:
+            potential_score = PotentialScoreCalculator.generate_potential_score(
+                row['pm25'],
+                row['aqi'],
+                row['so2'],
+                row['no2'],
+                row['co'],
+                row['o3'],
+                row['ndvi'],
+                row['sentinel'],
+                row['poverty_index']
+            )
+            row['ai_investment_score'] = potential_score
+
+        result = []
+        for row in rows:
+            row_dict = {}
+            for key, value in zip(columns, row):
+                row_dict[key] = value
+            result.append(row_dict)
+        
+        # Simpan data ke dalam file CSV
+        csv_file = 'infrastructure.csv'
+        fieldnames = result[0].keys()
+
+        with open(csv_file, 'w', newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            
+            writer.writeheader()
+            for data in result:
+                writer.writerow(data)
+
+        return result
+    
+
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/get-city-score/{provinceName}")
 def get_city_score(provinceName : str = None):
@@ -1025,9 +1077,10 @@ def get_city_detail(provinceName: str = None):
         
         result[i]['ai_investment_score'] = potential_score
     
-    generateInsight = insight_greenproject(result[0])
+    print(result)
+    # generateInsight = insight_greenproject(result[0])
     
-    result[0]['details'] = generateInsight
+    # result[0]['details'] = generateInsight
 
     return result
 
@@ -1221,17 +1274,12 @@ def get_infrastructure(province: str = None):
 
     return result
 
-@app.get("/insert-infrastructure/")
-def insert_all_infrastructure():
-    try:
-        for province in provinces:
-            get_infrastructure_detail()
-    except Exception as ex:
-        print(f"Error : {ex} ")
         
+# API untuk memasukkan data lingkungan infrastruktur ke dalam database
 @app.get("/insert-infrastructure-all")
-def get_carbon_offset():
+def insert_infrastructure_all():
     try:
+        # Fetch environmental data dari Google Earth Engine
         get_infrastructure_detail()
         return "Success inserting data to database"
     except Exception as ex:
@@ -1275,8 +1323,6 @@ def get_carbon_offset():
     conn.close()
 
     return result if result else {"error": "No data found"}
-
-
 
 @app.delete("/delete-all-infrastructure")
 def delete_all_infrastructure():

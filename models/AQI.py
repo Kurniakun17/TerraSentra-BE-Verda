@@ -11,3 +11,4 @@ def calculate_aqi_ispu(pm25):
         if bp_low <= pm25 <= bp_high:
             return round(((aqi_high - aqi_low) / (bp_high - bp_low)) * (pm25 - bp_low) + aqi_low)
     return None  
+
