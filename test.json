@@ -1,0 +1,35 @@
+{
+    "id": 3858,
+    "province": "jakarta selatan",
+    "poverty_index": 7.77,
+    "ndvi": 0.29,
+    "precipitation": 8.7,
+    "sentinel": -1.442,
+    "no2": 130.1,
+    "co": 32.476,
+    "so2": 142.862,
+    "o3": 0.117,
+    "pm25": 52.2,
+    "ai_investment_score": 80.64,
+    "period": "2025-05-31",
+    "level": "city",
+    "aqi": 96,
+    "evi_characteristics": "lowland",
+
+  "details": {
+    "region": "jakarta selatan",
+    "top_human_resource_skill": "Placeholder",
+    "top_natural_resource": "Placeholder",
+    "green_project": {
+      "name": "Placeholder Green Project",
+      "justification": "Based on the data provided",
+      "short_terms_jobs": [
+        {
+          "title": "Placeholder Job Title",
+          "description": "Placeholder Job Description"
+        }
+      ],
+      "environmental_impact": "Placeholder Environmental Impact"
+    }
+  }
+}

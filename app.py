@@ -458,10 +458,9 @@ def calculate_so2_aqi(so2_ppb):
 
 def insight_greenproject(result):
     load_dotenv()
-    api_key = os.getenv("GEMINI_API_KEY")
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+    api_key = "AIzaSyD-iA0AojDvy52GNI8TMD1lbpSG6SL8JD0"
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
     cityName = result.get("province")
-    
 
     input_text_green_project = f"""Provide a response ONLY in JSON format. DO NOT add explanatory text, introduction, or conclusion before or after the JSON.
     1.⁠ ⁠tentukan keahlian SDM dari {cityName}, berikan 1 jawaban teratas. tanpa penjelasan. 
@@ -489,7 +488,8 @@ region, top_human_resource_skill, top_natural_resource, green_project : name, ju
     }
 
     headers = {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "X-goog-api-key": api_key
     }
 
     try:
@@ -502,12 +502,14 @@ region, top_human_resource_skill, top_natural_resource, green_project : name, ju
         return generated_text
     except requests.exceptions.RequestException as e:
         print("Error:", e)
+        print("Response content:", getattr(e.response, 'text', 'No response'))
         return "An error occurred."
 
 
 def insight_credit(description, product_name, roi_value, price_value):
     load_dotenv()
     api_key = os.getenv("GEMINI_API_KEY")
+    print(api_key)
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
 
     input_text = f"""Create a 30-word investment funding to Green MSME’s, with  insight using these variables:
@@ -1077,10 +1079,11 @@ def get_city_detail(provinceName: str = None):
         
         result[i]['ai_investment_score'] = potential_score
     
-    print(result)
-    # generateInsight = insight_greenproject(result[0])
     
-    # result[0]['details'] = generateInsight
+    generateInsight = insight_greenproject(result[0])
+    
+    print(insight_greenproject)
+    result[0]['details'] = generateInsight
 
     return result
 
