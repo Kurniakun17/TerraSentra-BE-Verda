@@ -11,7 +11,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
-from typing import Optional,Dict
+from typing import Optional, Dict, List
+from pydantic import BaseModel
 import json
 from constants.coordinates import province_coords
 from constants.provinces import provinces
@@ -33,6 +34,23 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Pydantic models
+class GreenBondCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    photos: Optional[List[str]] = None
+    carbon_absorbed: Optional[int] = None
+    current_carbon_price: Optional[float] = None
+    carbon_per_million: Optional[float] = None
+    per_unit_price: Optional[float] = None
+    location: Optional[str] = None
+    roi: Optional[str] = None
+    fund_required: Optional[float] = None
+    fund_raised: Optional[float] = None
+    duration: Optional[int] = None
+    province: Optional[str] = None
+    starting_date: Optional[int] = None
 
 try:
     # ee.Initialize(project='davidsiddiii')
@@ -458,7 +476,7 @@ def calculate_so2_aqi(so2_ppb):
 
 def insight_greenproject(result):
     load_dotenv()
-    api_key = "AIzaSyD-iA0AojDvy52GNI8TMD1lbpSG6SL8JD0"
+    api_key = os.getenv("GEMINI_API_KEY")
     url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
     cityName = result.get("province")
 
@@ -509,7 +527,7 @@ region, top_human_resource_skill, top_natural_resource, green_project : name, ju
 def insight_credit(description, product_name, roi_value, price_value):
     load_dotenv()
     api_key = os.getenv("GEMINI_API_KEY")
-    print(api_key)
+    
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
 
     input_text = f"""Create a 30-word investment funding to Green MSME’s, with  insight using these variables:
@@ -550,7 +568,9 @@ Make it persuasive and clear. Use English language.
 
 
 def generate_insights(aqi_score, location, carbon_absorbed, project_name):
-    api_key = "AIzaSyD31L9QSRDJDhehutVdhmDrsdVidr-uhLQ"
+    load_dotenv()
+    api_key = os.getenv("GEMINI_API_KEY")
+
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
 
     input_text = f"""Buatkan ringkasan singkat dalam bentuk narasi analisis lingkungan berdasarkan 4 variabel berikut:
@@ -941,7 +961,8 @@ def get_green_credit(id_greencredit: Optional[int] = None):
     return result
 
 def generate_aqi_insights(province,co,no,so,infrastructure,renewable_energy):
-    api_key = "AIzaSyD31L9QSRDJDhehutVdhmDrsdVidr-uhLQ"
+    load_dotenv()
+    api_key = os.getenv("GEMINI_API_KEY")
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
 
     input_text = f"""
@@ -980,6 +1001,188 @@ def generate_aqi_insights(province,co,no,so,infrastructure,renewable_energy):
         return "An error occurred."
 
 
+@app.post("/green-bond")
+def create_green_bond(green_bond: GreenBondCreate):
+    """
+    Create a new green bond entry in the database.
+    Auto-fixes sequence issues and retries on duplicate key errors.
+    """
+    max_retries = 2
+    conn = None
+    
+    for attempt in range(max_retries):
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            # Insert query
+            insert_query = """
+                INSERT INTO green_bond (
+                    name, description, photos, carbon_absorbed, current_carbon_price,
+                    carbon_per_million, per_unit_price, location, roi, fund_required,
+                    fund_raised, duration, province, starting_date
+                ) VALUES (
+                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                ) RETURNING id
+            """
+            
+            cursor.execute(insert_query, (
+                green_bond.name,
+                green_bond.description,
+                green_bond.photos,
+                green_bond.carbon_absorbed,
+                green_bond.current_carbon_price,
+                green_bond.carbon_per_million,
+                green_bond.per_unit_price,
+                green_bond.location,
+                green_bond.roi,
+                green_bond.fund_required,
+                green_bond.fund_raised,
+                green_bond.duration,
+                green_bond.province,
+                green_bond.starting_date
+            ))
+            
+            # Get the ID of the newly created record
+            new_id = cursor.fetchone()[0]
+            
+            # Generate random AQI values
+            so2_value = random.uniform(200, 400)
+            no2_value = random.uniform(50, 150)
+            co_value = random.uniform(30, 36)
+            
+            # Calculate AQI score (simple average-based calculation)
+            # Normalize values to 0-100 scale and average them
+            so2_normalized = ((so2_value - 200) / 200) * 100  # 200-400 -> 0-100
+            no2_normalized = ((no2_value - 50) / 100) * 100   # 50-150 -> 0-100
+            co_normalized = ((co_value - 30) / 6) * 100       # 30-36 -> 0-100
+            aqi_score = (so2_normalized + no2_normalized + co_normalized) / 3
+            
+            # Insert AQI data linked to the new green bond
+            aqi_insert_query = """
+                INSERT INTO aqi (bond_id, score, so2, no2, co)
+                VALUES (%s, %s, %s, %s, %s)
+                RETURNING id
+            """
+            
+            cursor.execute(aqi_insert_query, (
+                new_id,
+                round(aqi_score, 2),
+                round(so2_value, 2),
+                round(no2_value, 2),
+                round(co_value, 2)
+            ))
+            
+            aqi_id = cursor.fetchone()[0]
+            
+            conn.commit()
+            cursor.close()
+            conn.close()
+            
+            return {
+                "status": "success",
+                "message": "Green bond and AQI data created successfully",
+                "id": new_id,
+                "aqi_id": aqi_id,
+                "aqi_data": {
+                    "score": round(aqi_score, 2),
+                    "so2": round(so2_value, 2),
+                    "no2": round(no2_value, 2),
+                    "co": round(co_value, 2)
+                },
+                "data": green_bond.dict()
+            }
+            
+        except psycopg2.IntegrityError as e:
+            if conn:
+                conn.rollback()
+                conn.close()
+                conn = None
+            
+            error_msg = str(e)
+            # If it's a duplicate key error and we haven't exhausted retries
+            if ("green_bond_pkey" in error_msg or "duplicate key" in error_msg) and attempt < max_retries - 1:
+                # Try to fix the sequence automatically
+                try:
+                    fix_conn = get_db_connection()
+                    fix_cursor = fix_conn.cursor()
+                    fix_cursor.execute("""
+                        SELECT setval('green_bond_id_seq', 
+                                     COALESCE((SELECT MAX(id) FROM green_bond), 0) + 1, 
+                                     false)
+                    """)
+                    fix_conn.commit()
+                    fix_cursor.close()
+                    fix_conn.close()
+                    # Continue to next retry attempt
+                    continue
+                except Exception as fix_error:
+                    return {
+                        "status": "error",
+                        "message": f"Failed to auto-fix sequence: {str(fix_error)}"
+                    }
+            else:
+                # Last attempt failed or different integrity error
+                return {
+                    "status": "error",
+                    "message": f"Integrity error after {attempt + 1} attempts: {error_msg}"
+                }
+                
+        except Exception as e:
+            if conn:
+                conn.rollback()
+                conn.close()
+            return {
+                "status": "error",
+                "message": f"Failed to create green bond: {str(e)}"
+            }
+    
+    return {
+        "status": "error",
+        "message": "Failed to create green bond after maximum retries"
+    }
+
+@app.post("/green-bond/fix-sequence")
+def fix_green_bond_sequence():
+    """
+    Fix the green_bond table ID sequence when it gets out of sync.
+    This resolves duplicate key errors.
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Reset the sequence to the maximum ID in the table
+        cursor.execute("""
+            SELECT setval('green_bond_id_seq', 
+                         COALESCE((SELECT MAX(id) FROM green_bond), 1), 
+                         true)
+        """)
+        
+        # Get the new sequence value
+        cursor.execute("SELECT last_value FROM green_bond_id_seq")
+        new_sequence_value = cursor.fetchone()[0]
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return {
+            "status": "success",
+            "message": "Sequence fixed successfully",
+            "next_id": new_sequence_value + 1
+        }
+        
+    except Exception as e:
+        if conn:
+            conn.rollback()
+            conn.close()
+        return {
+            "status": "error",
+            "message": f"Failed to fix sequence: {str(e)}"
+        }
+
+@app.get("/green-bond")
 @app.get("/green-bond/")
 @app.get("/green-bond/{id_greenbond}")
 def get_greenbond(id_greenbond: Optional[int] = None):
@@ -1027,19 +1230,26 @@ def get_greenbond(id_greenbond: Optional[int] = None):
         for period, ndvi, *_ in periodic_rows:
             ndvi_periodic[str(period)] = ndvi
 
-
         result[0]['ndvi'] = ndvi_periodic
         result[0]['insights'] = generate_insights(
             result[0]['aqi'],
             result[0]['location'],
             result[0]['carbonabsorbed'],
             result[0]['name'])
-        result[0]['general_insights'] = generate_aqi_insights(
-            province,result[0]['aqi']['variable']['co'],
-            result[0]['aqi']['variable']['no2'],
-            result[0]['aqi']['variable']['so2'],
-            infrastructure,renewable_energy
-        )
+        
+        # Check if AQI data exists and has the required structure
+        if result[0].get('aqi') and isinstance(result[0]['aqi'], dict) and result[0]['aqi'].get('variable'):
+            aqi_vars = result[0]['aqi']['variable']
+            result[0]['general_insights'] = generate_aqi_insights(
+                province,
+                aqi_vars.get('co', 0),
+                aqi_vars.get('no2', 0),
+                aqi_vars.get('so2', 0),
+                infrastructure,
+                renewable_energy
+            )
+        else:
+            result[0]['general_insights'] = "AQI data not available for detailed insights."
     
     conn.close()
     
