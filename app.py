@@ -20,7 +20,6 @@ from constants.greenInfrastructure import green_infra_costs, high_ndvi_air, low_
 from constants.news import news_sites, energy_sites
 from constants.renewableEnergy import renewable_energy_projects_high_poverty, renewable_energy_projects_low_poverty
 from models.AQI import calculate_aqi_ispu
-from models.potentialScore import PotentialScoreCalculator
 from utils.functions import convert_json_string_to_dict, remove_json_wrapper
 import csv
 
@@ -838,26 +837,12 @@ def get_csv():
         columns = [desc[0] for desc in cursor.description]
         conn.close()
 
-        # Mapping data ke dalam dictionary & Potential Score
-        for row in rows:
-            potential_score = PotentialScoreCalculator.generate_potential_score(
-                row['pm25'],
-                row['aqi'],
-                row['so2'],
-                row['no2'],
-                row['co'],
-                row['o3'],
-                row['ndvi'],
-                row['sentinel'],
-                row['poverty_index']
-            )
-            row['ai_investment_score'] = potential_score
-
         result = []
         for row in rows:
             row_dict = {}
             for key, value in zip(columns, row):
                 row_dict[key] = value
+            row_dict["ai_investment_score"] = row_dict.get("potential_score")
             result.append(row_dict)
         
         # Simpan data ke dalam file CSV
@@ -909,19 +894,7 @@ def get_city_score(provinceName : str = None):
 
 
     for i in range(len(result)):
-        potential_score = PotentialScoreCalculator.generate_potential_score(
-            result[i]['pm25'],
-            result[i]['aqi'],
-            result[i]['so2'],
-            result[i]['no2'],
-            result[i]['co'],
-            result[i]['o3'],
-            result[i]['ndvi'],
-            result[i]['sentinel'],
-            result[i]['poverty_index']
-        ) 
-        
-        result[i]['ai_investment_score'] = potential_score
+        result[i]['ai_investment_score'] = result[i].get('potential_score')
 
     return result
 
@@ -1250,7 +1223,24 @@ def get_greenbond(id_greenbond: Optional[int] = None):
             )
         else:
             result[0]['general_insights'] = "AQI data not available for detailed insights."
-    
+
+        try:
+            cursor.execute(
+                """
+                SELECT annual_absorption, total_credits, price_per_ton, certifier,
+                       methodology, start_year, trees_equivalent, cars_equivalent, homes_equivalent
+                FROM carbon_credit_impact
+                WHERE bond_id = %s
+                """,
+                (id_greenbond,)
+            )
+            carbon_row = cursor.fetchone()
+            if carbon_row:
+                impact_cols = [desc[0] for desc in cursor.description]
+                result[0]['carbon_impact'] = {k: v for k, v in zip(impact_cols, carbon_row)}
+        except Exception as e:
+            print(f"Error fetching carbon impact: {e}")
+
     conn.close()
     
     
@@ -1258,10 +1248,13 @@ def get_greenbond(id_greenbond: Optional[int] = None):
 
 @app.get('/get-city-detail')
 def get_city_detail(provinceName: str = None):
-    query = f"SELECT * FROM infrastructure WHERE level = 'city' AND province = '{provinceName}'"
+    if provinceName is None:
+        return {"error": "provinceName parameter is required"}
+    
+    query = "SELECT * FROM infrastructure WHERE level = 'city' AND LOWER(province) = LOWER(%s)"
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute(query)
+    cursor.execute(query, (provinceName,))
     rows = cursor.fetchall()
     columns = [desc[0] for desc in cursor.description]
     conn.close()
@@ -1273,33 +1266,26 @@ def get_city_detail(provinceName: str = None):
             row_dict[key] = value
         result.append(row_dict)
     
+    if not result:
+        return {"error": f"No city data found for province: {provinceName}"}
 
     for i in range(len(result)):
-        potential_score = PotentialScoreCalculator.generate_potential_score(
-            result[i]['pm25'],
-            result[i]['aqi'],
-            result[i]['so2'],
-            result[i]['no2'],
-            result[i]['co'],
-            result[i]['o3'],
-            result[i]['ndvi'],
-            result[i]['sentinel'],
-            result[i]['poverty_index']
-        ) 
-        
-        result[i]['ai_investment_score'] = potential_score
-    
+        result[i]['ai_investment_score'] = result[i].get('potential_score')
     
     generateInsight = insight_greenproject(result[0])
-    
-    print(insight_greenproject)
     result[0]['details'] = generateInsight
 
     return result
 
 @app.get("/get-top-five")
 def get_top_five():
-    query = "SELECT * FROM infrastructure WHERE level = 'city' order by ai_investment_score desc limit 5"
+    query = """
+        SELECT *
+        FROM infrastructure
+        WHERE level = 'city' AND potential_score IS NOT NULL
+        ORDER BY potential_score DESC
+        LIMIT 5
+    """
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(query)    
@@ -1318,19 +1304,7 @@ def get_top_five():
     print(result)
 
     for i in range(len(result)):
-        potential_score = PotentialScoreCalculator.generate_potential_score(
-            result[i]['pm25'],
-            result[i]['aqi'],
-            result[i]['so2'],
-            result[i]['no2'],
-            result[i]['co'],
-            result[i]['o3'],
-            result[i]['ndvi'],
-            result[i]['sentinel'],
-            result[i]['poverty_index']
-        ) 
-        
-        result[i]['ai_investment_score'] = potential_score
+        result[i]['ai_investment_score'] = result[i].get('potential_score')
 
     
     return result
@@ -1379,18 +1353,7 @@ def get_infrastructure_province(province: str = None):
         result.append(row_dict)
     
     for i in range(len(result)):
-        potential_score = PotentialScoreCalculator.generate_potential_score(
-            result[i]['pm25'],
-            result[i]['aqi'],
-            result[i]['so2'],
-            result[i]['no2'],
-            result[i]['co'],
-            result[i]['o3'],
-            result[i]['ndvi'],
-            result[i]['sentinel'],
-            result[i]['poverty_index']
-        ) 
-        result[i]['ai_investment_score'] = potential_score
+        result[i]['ai_investment_score'] = result[i].get('potential_score')
 
 
     return result
@@ -1415,19 +1378,7 @@ def get_infrastructure_province(province: str = None):
     
     
     for i in range(len(result)):
-        potential_score = PotentialScoreCalculator.generate_potential_score(
-            result[i]['pm25'],
-            result[i]['aqi'],
-            result[i]['so2'],
-            result[i]['no2'],
-            result[i]['co'],
-            result[i]['o3'],
-            result[i]['ndvi'],
-            result[i]['sentinel'],
-            result[i]['poverty_index']
-        ) 
-        
-        result[i]['ai_investment_score'] = potential_score
+        result[i]['ai_investment_score'] = result[i].get('potential_score')
 
     return result
         
@@ -1484,6 +1435,12 @@ def get_infrastructure(province: str = None):
             if key != 'period':
                 row_dict[key] = value
         result.append(row_dict)
+
+    try:
+        for item in result:
+            print(f"[get-infrastructure] province={province} level={item.get('level')} potential_score={item.get('potential_score')}")
+    except Exception as log_err:
+        print(f"[get-infrastructure] log error: {log_err}")
 
     return result
 
